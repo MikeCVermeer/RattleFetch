@@ -61,14 +61,20 @@ class RattleFetch(tk.Tk):
             try:
                 # Create a youtube object
                 try:
-                    yt = YouTube(url)
+                    yt = YouTube(url, on_progress_callback=self.progress_function)
                 except Exception as e2:
                     messagebox.showerror("Error", f"Could not create YouTube object: {e2}")
                     print('error')
                     return
 
-                # Get the highest resolution video
+                #Get the highest resolution video that is progressive
+                print(yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first())
                 video = yt.streams.get_highest_resolution()
+
+                # Get the video with the highest resolution non progressive way
+               # video = yt.streams.filter(progressive=False, file_extension='mp4').order_by('resolution').desc().first()
+                # Get the audio stream belonging to the above video
+               # audio = yt.streams.filter(only_audio=True).order_by('abr').desc().first()
 
                 # Get the title of the video
                 title = video.title
@@ -86,11 +92,8 @@ class RattleFetch(tk.Tk):
                 self.time_remaining_label = ttk.Label(self, text="Time Remaining: Calculating...")
                 self.time_remaining_label.pack(pady=10)
 
-                # Download the video
+                # Download the video, and update the progress bar while downloading
                 video.download(download_location)
-
-                # Update while downloading
-                video.register_on_progress_callback(self.progress_function)
 
                 # Create a label to show the download is complete
                 self.complete_label = ttk.Label(self, text="Download Complete")
@@ -108,6 +111,10 @@ class RattleFetch(tk.Tk):
                 self.file_size_label = ttk.Label(self, text=f"File Size: {file_size} bytes")
                 self.file_size_label.pack(pady=10)
 
+                # Create a label that shows who made the program
+                self.creator_label = ttk.Label(self, text="Created by Mike Vermeer")
+                self.creator_label.pack(pady=10)
+
             except Exception as e:
                 messagebox.showerror("Error", e)
 
@@ -115,20 +122,21 @@ class RattleFetch(tk.Tk):
         # Set the progress bar color to green
         self.progress_bar["style"] = "green.Horizontal.TProgressbar"
 
-        # Calculate the time remaining in seconds
-        time_remaining = bytes_remaining / stream.filesize * stream.duration
+        # Calculate the time remaining without using time.duration
+        # Get the file size of the video
+        file_size = stream.filesize
 
-        # Convert the time remaining to minutes and seconds
-        minutes, seconds = divmod(time_remaining, 60)
+        # Get the percentage of the file that has been downloaded
+        percent = (1 - bytes_remaining / file_size) * 100
 
-        # Convert the time remaining to hours, minutes, and seconds
-        hours, minutes = divmod(minutes, 60)
+        # Get the speed at which the file is downloading in bytes per second
+        speed = stream.filesize / percent
 
-        # Format the time remaining
-        time_remaining_formatted = "{:0>2}:{:0>2}:{:05.2f}".format(int(hours), int(minutes), seconds)
+        # Get the time remaining in seconds
+        time_remaining = bytes_remaining / speed
 
         # Update the time remaining label
-        self.time_remaining_label.config(text=f"Time Remaining: {time_remaining_formatted}")
+        self.time_remaining_label["text"] = f"Time Remaining: {time_remaining} seconds"
 
         # Get the percentage of the file that has been downloaded
         percent = (1 - bytes_remaining / stream.filesize) * 100
