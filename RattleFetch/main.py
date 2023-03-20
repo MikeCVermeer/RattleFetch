@@ -58,7 +58,7 @@ class RattleFetch(tk.Tk):
         # Create a label at the bottom that shows who made the program and the version
         self.author_label = ttk.Label(self, text="Created by Mike Vermeer", font=("Arial", 10), foreground="#888")
         self.author_label.pack(side=tk.LEFT, padx=20, pady=10)
-        self.version_label = ttk.Label(self, text="Version 0.2", font=("Arial", 10), foreground="#888")
+        self.version_label = ttk.Label(self, text="Version 0.4", font=("Arial", 10), foreground="#888")
         self.version_label.pack(side=tk.LEFT, padx=20, pady=10)
 
         # Create a exit button at the bottom right corner
