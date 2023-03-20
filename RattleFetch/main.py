@@ -195,7 +195,7 @@ class RattleFetch(tk.Tk):
         mb_size = video.filesize / 1024 / 1024
 
         # Create a label to show time remaining
-        self.time_remaining_label = ttk.Label(self, text="Time Remaining: Calculating...")
+        self.time_remaining_label = ttk.Label(self, text="Your download is complete in a few seconds.")
         self.time_remaining_label.pack(pady=10)
 
         # Download the video, and update the progress bar while downloading
@@ -289,17 +289,6 @@ class RattleFetch(tk.Tk):
         # Calculate the time remaining without using time.duration
         # Get the file size of the video
         file_size = stream.filesize
-
-        # Get the percentage of the file that has been downloaded
-        percent = (1 - bytes_remaining / file_size) * 100
-
-        self.start_time = time.time()
-
-        # Calculate the time remaining based on the percentage of the file that has been downloaded and the time it took to download that percentage
-        time_remaining = round((time.time() - self.start_time) / percent * (100 - percent))
-
-        # Update the time remaining label
-        self.time_remaining_label["text"] = f"Time Remaining: {time_remaining} seconds"
 
         # Get the percentage of the file that has been downloaded
         percent = (1 - bytes_remaining / stream.filesize) * 100
