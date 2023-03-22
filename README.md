@@ -1,7 +1,7 @@
 # RattleFetch
 Rattlefetch is an application created to download Youtube videos through a simple GUI(Graphical User Interface).
 
-#Usage
+# Usage
 First you need to select a location to download your video to. 
 After that the Search button becomes active. 
 Now insert a YouTube link into the search bar.
