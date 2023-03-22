@@ -18,52 +18,79 @@ class RattleFetch(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("RattleFetch")
-        self.geometry("900x600")
+        self.geometry("1920x1080")
+        self.state("zoomed")
         self.resizable(True, True)
         self.create_widgets()
+        self.style = ttk.Style()
+        
+        # Configure the styles
+        self.style.configure("TFrame", background="#181818")
+        self.style.configure("TLabel", background="#181818", foreground="#ff0000")
+        self.style.configure("TButton", background="#181818", foreground="#ff0000")
+        self.style.configure("TEntry", background="#282828", foreground="#ff0000", fieldbackground="#282828", insertcolor="#ffffff")
+        self.style.configure("red.Horizontal.TProgressbar", background="#ff0000", troughcolor="#282828")
+        
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
+
+
 
     def create_widgets(self):
-        # Create a frame for the entry box
-        self.entry_frame = ttk.Frame(self, padding=20)
-        self.entry_frame.pack()
+        self.container = ttk.Frame(self, padding=20)
+        self.container.pack(fill=tk.BOTH, expand=True)
 
-        # Create a label for the entry box
+        self.header_frame = ttk.Frame(self.container)
+        self.header_frame.pack(side=tk.TOP, fill=tk.X, pady=10)
+
+        self.title_label = ttk.Label(self.header_frame, text="RattleFetch", font=("Arial", 24), foreground="#ff0000")
+        self.title_label.pack(side=tk.TOP)
+
+        self.instructions_label = ttk.Label(
+            self.header_frame,
+            text="Enter a YouTube URL and select a location to download the video",
+            font=("Arial", 14),
+            foreground="#666",
+        )
+        self.instructions_label.pack(side=tk.TOP, pady=5)
+
+        self.entry_frame = ttk.Frame(self.container, padding=20)
+        self.entry_frame.pack(side=tk.TOP, fill=tk.X, pady=10)
+
         self.entry_label = ttk.Label(self.entry_frame, text="Enter a YouTube URL:")
         self.entry_label.pack(side=tk.LEFT, padx=5)
 
-        # Create an entry box
         self.entry_box = ttk.Entry(self.entry_frame, width=50, font=("Arial", 12))
-        self.entry_box.pack(side=tk.LEFT, padx=5)
+        self.entry_box.pack(side=tk.LEFT, padx=5, fill=tk.X, expand=True)
 
-        # Create a frame for the buttons
-        self.button_frame = ttk.Frame(self, padding=20)
-        self.button_frame.pack()
+        self.button_frame = ttk.Frame(self.container, padding=20)
+        self.button_frame.pack(side=tk.TOP, fill=tk.X, pady=10)
 
-        # Create a button to search for the video
         self.get_video_button = ttk.Button(self.button_frame, text="Search", command=self.get_video, state=tk.DISABLED)
-        self.get_video_button.grid(row=0, column=0, padx=5, pady=10)
+        self.get_video_button.pack(side=tk.LEFT, padx=5)
 
-        # Create a button to select a download location
         self.location_button = ttk.Button(self.button_frame, text="Select Location", command=self.select_location)
-        self.location_button.grid(row=0, column=1, padx=5, pady=10)
+        self.location_button.pack(side=tk.LEFT, padx=5)
 
-        # Create a frame for the progress bar
-        self.progress_frame = ttk.Frame(self, padding=20)
-        self.progress_frame.pack()
+        self.progress_frame = ttk.Frame(self.container, padding=20)
+        self.progress_frame.pack(side=tk.TOP, fill=tk.X, pady=10)
 
-        # Create a progress bar
-        self.progress_bar = ttk.Progressbar(self.progress_frame, orient=tk.HORIZONTAL, length=400, mode="determinate")
-        self.progress_bar.pack(pady=10)
+        self.progress_bar = ttk.Progressbar(
+            self.progress_frame, orient=tk.HORIZONTAL, length=400, mode="determinate", style="red.Horizontal.TProgressbar"
+        )
+        self.progress_bar.pack(pady=10, fill=tk.X, expand=True)
 
-        # Create a label at the bottom that shows who made the program and the version
-        self.author_label = ttk.Label(self, text="Created by Mike Vermeer", font=("Arial", 10), foreground="#888")
-        self.author_label.pack(side=tk.LEFT, padx=20, pady=10)
-        self.version_label = ttk.Label(self, text="Version 0.4", font=("Arial", 10), foreground="#888")
-        self.version_label.pack(side=tk.LEFT, padx=20, pady=10)
+        self.footer_frame = ttk.Frame(self.container, padding=20)
+        self.footer_frame.pack(side=tk.BOTTOM, fill=tk.X, pady=10)
 
-        # Create a exit button at the bottom right corner
-        self.exit_button = ttk.Button(self, text="Exit", command=self.destroy)
-        self.exit_button.pack(side=tk.RIGHT, padx=20, pady=10)
+        self.author_label = ttk.Label(self.footer_frame, text="Created by Mike Vermeer", font=("Arial", 10), foreground="#888")
+        self.author_label.pack(side=tk.LEFT)
+
+        self.version_label = ttk.Label(self.footer_frame, text="Version 0.5", font=("Arial", 10), foreground="#888")
+        self.version_label.pack(side=tk.LEFT, padx=20)
+
+        self.exit_button = ttk.Button(self.footer_frame, text="Exit", command=self.destroy)
+        self.exit_button.pack(side=tk.RIGHT)
 
         # Set focus on the entry box
         self.entry_box.focus()
@@ -79,11 +106,11 @@ class RattleFetch(tk.Tk):
                 self.progressive_or_non_progressive = messagebox.showinfo("Progressive or non progressive", "Do you want to download a progressive video or a non progressive video? \n\nProgressive videos are videos that are downloaded in one go. \n\nNon progressive videos are videos that are downloaded in multiple parts. The audio and video will be separate files. Nonprogressive allows for higher resolutions to be downloaded. \n\nProgressive videos only go up to 720p resolution. \n\nIf you are not sure, choose progressive.")
 
                 # Create a label to show a video has been found
-                self.video_found_label = ttk.Label(self, text="Video found!")
+                self.video_found_label = ttk.Label(self.container, text="Video found!")
                 self.video_found_label.pack(pady=10)
 
                 # Create a frame for the video title
-                self.title_frame = ttk.Frame(self)
+                self.title_frame = ttk.Frame(self.container)
                 self.title_frame.pack(pady=10)
 
                 # Create a label for the video title
@@ -92,7 +119,7 @@ class RattleFetch(tk.Tk):
 
                 # Ask the user if they want to progressive or non progressive video
                 # Create a frame for the radio buttons
-                self.radio_frame = ttk.Frame(self)
+                self.radio_frame = ttk.Frame(self.container)
                 self.radio_frame.pack(pady=10)
 
                 # Create a label for the radio buttons
@@ -155,7 +182,7 @@ class RattleFetch(tk.Tk):
                     resolutions.append(stream.resolution + " " + str(stream.fps) + "fps")
 
             # Create a frame for the resolutions
-            self.resolutions_frame = ttk.Frame(self)
+            self.resolutions_frame = ttk.Frame(self.container)
             self.resolutions_frame.pack(pady=10)
 
             # Create a label for the resolutions
@@ -195,7 +222,7 @@ class RattleFetch(tk.Tk):
         mb_size = video.filesize / 1024 / 1024
 
         # Create a label to show time remaining
-        self.time_remaining_label = ttk.Label(self, text="Your download is complete in a few seconds.")
+        self.time_remaining_label = ttk.Label(self.container, text="Your download is complete in a few seconds.")
         self.time_remaining_label.pack(pady=10)
 
         # Download the video, and update the progress bar while downloading
@@ -234,23 +261,23 @@ class RattleFetch(tk.Tk):
         self.resolutions_frame.destroy()
 
         # Create a label to show the download is complete
-        self.complete_label = ttk.Label(self, text="Download Complete")
+        self.complete_label = ttk.Label(self.container, text="Download Complete")
         self.complete_label.pack(pady=10)
 
         # Create a label to show the location of the video
-        self.location_label = ttk.Label(self, text=f"Location: {download_location}")
+        self.location_label = ttk.Label(self.container, text=f"Location: {download_location}")
         self.location_label.pack(pady=10)
 
         # Create a label to show the title of the video
-        self.title_label = ttk.Label(self, text=f"Title: {title}")
+        self.title_label = ttk.Label(self.container, text=f"Title: {title}")
         self.title_label.pack(pady=10)
 
         # Create a label to show the file size of the video
-        self.file_size_label = ttk.Label(self, text=f"File Size: {mb_size} Megabytes")
+        self.file_size_label = ttk.Label(self.container, text=f"File Size: {mb_size} Megabytes")
         self.file_size_label.pack(pady=10)
 
         # Create a button to open the location of the video and exit the program
-        self.open_button = ttk.Button(self, text="Open Location", command=lambda: self.open_location(download_location))
+        self.open_button = ttk.Button(self.container, text="Open Location", command=lambda: self.open_location(download_location))
         self.open_button.pack(pady=10)
 
 
@@ -283,8 +310,8 @@ class RattleFetch(tk.Tk):
 
 
     def progress_function(self, stream, chunk, bytes_remaining):
-        # Set the progress bar color to green
-        self.progress_bar["style"] = "green.Horizontal.TProgressbar"
+        # Set the progress bar color to red
+        self.progress_bar["style"] = "red.Horizontal.TProgressbar"
 
         # Calculate the time remaining without using time.duration
         # Get the file size of the video
@@ -306,7 +333,7 @@ class RattleFetch(tk.Tk):
             messagebox.showerror("Error", "Please select a location")
         else:
             # Create a label to show the location
-            self.location_label = ttk.Label(self, text=f"Location: {self.location}")
+            self.location_label = ttk.Label(self.container, text=f"Location: {self.location}")
             self.location_label.pack(pady=10)
 
         #Enable the Search button called get_video_button
